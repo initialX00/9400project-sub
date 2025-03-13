@@ -4,6 +4,8 @@
 
 create a draft
 
+경로지정
+
 -[ ] 프로젝트 이름
 
 create branch

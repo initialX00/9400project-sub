@@ -1,5 +1,10 @@
-AdminPage 삽입하기
+프론트 브릿지 :: 내꺼 23-folder-merge3
 
-common 삽입하기
 
-adminRoute 삽입하기
+
+
+회원가입 - 로그인 - jwt토큰 생성 및 응답 - 로컬스토리지에 저장 - 인증이 필요한 곳에 사용
+
+csrf사이트호출 미사용, 별도창로그인 미사용, form 미사용, 세션 미사용, cors 사용, 필터 사용, 예외 핸들러 사용, 요청url 권한 세팅
+
+prisiper - atherities에 각종 권한 정보가 저장

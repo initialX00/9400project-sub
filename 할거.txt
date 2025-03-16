@@ -8,3 +8,63 @@
 csrf사이트호출 미사용, 별도창로그인 미사용, form 미사용, 세션 미사용, cors 사용, 필터 사용, 예외 핸들러 사용, 요청url 권한 세팅
 
 prisiper - atherities에 각종 권한 정보가 저장
+
+
+
+
+
+
+<resultMap id="adminMenuManageResultMap" type="com.korit.mcdonaldkiosk.entity.MenuManage">
+        <id property="menuMageId" column="menu_manage_id" />
+        <result property="menuId" column="mt_menuId" />
+        <collection property="menuPriceId" resultMap="mpt_menu_price_id" />
+        <collection property="menuCategoryId" resultMap="mct_menuCategoryId" />
+        <collection property="menuStateId" resultMap="mst_menuStateId" />
+    </resultMap>
+    <resultMap id="adminMenuNameMap" type="com.korit.mcdonaldkiosk.entity.Menu">
+        <id property="menuId" column="menu_id" />
+        <result property="menuName" column="menu_name" />
+    </resultMap>
+    <resultMap id="adminMenuPriceMap" type="com.korit.mcdonaldkiosk.entity.MenuPrice">
+        <id property="menuPriceId" column="menu_price_id" />
+        <result property="menuPrice" column="menu_price" />
+        <result property="menuId" column="mt_menuId" />
+    </resultMap>
+    <resultMap id="adminMenuCategoryMap" type="com.korit.mcdonaldkiosk.entity.MenuCategory">
+        <id property="menuCategoryId" column="menu_category_id" />
+        <result property="menuCategoryName" column="menu_category_name" />
+        <result property="menuId" column="mt_menuId" />
+    </resultMap>
+    <resultMap id="adminMenuStateMap" type="com.korit.mcdonaldkiosk.entity.MenuState">
+        <id property="menuStateId" column="menu_state_id" />
+        <result property="menuState" column="menu_state" />
+        <result property="menuId" column="mt_menuId" />
+    </resultMap>
+
+
+    <select id="adminMenuManageResultMap" resultMap="adminMenuStateMangeMap">
+        select
+            mt.menu_name,
+            mpt.menu_price,
+            mct.menu_category,
+            mst.menu_state
+        from
+            menu_tb mt
+            left outer join menu_price_tb mpt on (mpt.menu_id = mt.menu_id)
+            left outer join menu_category_tb mct on (mct.menu_id = mt.menu_id)
+            left outer join menu_state_tb mst on (mst.menu_id = mt.menu_id)
+    </select>
+
+    <!--
+    테이블 구상
+    (사이즈 옵션은 구현하지 않고 메뉴로 넣기)
+    메뉴이름 테이블 - 메뉴ID, 메뉴이름
+    메뉴가격 테이블 - 가격ID, 메뉴가격, 메뉴ID
+    메뉴카테고리 테이블 - 카테고리ID, 카테고리이름, 메뉴ID
+    메뉴상태 테이블 - 상태ID, on(1)/off(0) (기본1), 메뉴ID
+    메뉴정보 테이블 - 정보ID, 원산지, 영양정보, 알레르기, 메뉴ID
+    햄버거옵션 테이블 - 햄버거옵션ID, 햄버거옵션 종류
+    사이드옵션 테이블 - 사이드옵션ID, 딥핑소스 종류
+    커피옵션 테이블 - 시럽옵션Id, 시럽 및 샷 종류
+    디저트옵션 테이블 - 디저트옵션ID, 디저스소스 종류
+    -->

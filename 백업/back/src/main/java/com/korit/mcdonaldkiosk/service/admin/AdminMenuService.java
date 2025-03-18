@@ -1,35 +1,40 @@
 package com.korit.mcdonaldkiosk.service.admin;
 
+import com.korit.mcdonaldkiosk.dto.request.ReqMenuListDto;
 import com.korit.mcdonaldkiosk.entity.Menu;
 import com.korit.mcdonaldkiosk.repository.admin.AdminMenuRepository;
-import com.korit.mcdonaldkiosk.repository.user.MenuRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
-@RequiredArgsConstructor
 public class AdminMenuService {
 
     @Autowired
     private AdminMenuRepository adminMenuRepository;
 
     // 모든 카테고리를 조회하는 메서드
-    public List<Menu> getAllCategories() {
-        return adminMenuRepository.findAllCategories();
+    public List<String> getAllCategories() {
+        List<Menu> allCategories = adminMenuRepository.findAllCategories();
+        //객체에서 카테고리 값만 빼온다.
+        List<String> categories = allCategories.stream()
+                .map(Menu::getMenuCategory)
+                .collect(Collectors.toList());
+        return categories;
     }
 
-    // 모든 목록을 조회하는 메서드
+    // 모든 메뉴를 조회하는 메서드
     public List<Menu> getAllAdminMenuList() {
-        // 모든 메뉴를 반환
         return adminMenuRepository.findAllAdminMenus();
     }
 
-    // 카테고리 이름으로 해당 카테고리의 정보를 조회하는 메서드
-    public List<Menu> getAdminMenuListByCategory(String categoryName) {
-        // 카테고리 이름을 통해 해당 카테고리의 정보를 조회하고 반환
-        return adminMenuRepository.findAdminMenusByCategory(categoryName);
+    // 메뉴 갯수를 페이지에 할당하는 메서드
+    public int getMenuListCountByCategory(String searchCategory) {
+        return adminMenuRepository.findMenuCountAllBySearchCategory(searchCategory);
     }
+
 }

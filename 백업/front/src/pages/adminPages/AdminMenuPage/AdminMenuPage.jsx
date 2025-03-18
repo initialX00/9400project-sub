@@ -4,31 +4,47 @@ import * as s from './style';
 import React, { useEffect, useState } from 'react';
 import { MenuItem, Select } from '@mui/material';
 import { useSearchParams } from 'react-router-dom';
+import { useAllMenuList, useGetCategories, useMenuListByCategoryApi } from '../../../queries/AdminQuery/AdminMenuBoardQuery';
 
 function AdminMenuPage(props) {
     const [ searchParams, setSearchParams ] = useSearchParams();
     const page = parseInt(searchParams.get("page") || "1"); //현재 페이지번호 읽기
-    const category = searchParams.get("category") || "all"; //카테고리 상태
+    const category = searchParams.get("category") || "전체"; //카테고리 상태
+    const { data: searchMenuList } = useAllMenuList(); //모든 메뉴 불러오기
 
-    const [ isLoding, setIsLoading ] = useState(true); //데이터 로딩 상태
     const [ pageNumbers, setPageNumbers ] = useState([]); //페이지 번호 상태
     const [ totalPages, setTotalPages ] = useState(1); //총 페이지 수 상태
 
+    const countMenuListByCategory = useMenuListByCategoryApi({
+        page,
+        limitCount: 10,
+        category,
+    })
 
-    //카테고리 선택
+
+    //카테고리
+    const basicCategories = [
+        {label: "전체", value: "전체"},
+    ];
+
+    const { data: getCategory } = useGetCategories();
+
     const selectCategories = [
-        {label: "전체", value: "all"},
-        {label: "버거", value: "burger"},
-        {label: "사이드", value: "side"},
-        {label: "음료", value: "drink"},
-        {label: "커피", value: "coffee"},
-    ]
+        ...basicCategories,
+        ...(getCategory?.data.map((category) => ({
+            label: category,
+            value: category
+        })) || [])
+    ];
+    //console.log(selectCategories);
 
 
+
+    //페이지 관련 작성해야 오류해결
     useEffect(() => {
-        if(!searchMenuList.isLoading) {
-            const currentPage = searchMenuList?.data?.data.page || 1;
-            const totalPages = searchMenuList?.data?.data.totalPages || 1;
+        if(!countMenuListByCategory.isLoading) {
+            const currentPage = countMenuListByCategory?.data?.data.page || 1;
+            const totalPages = countMenuListByCategory?.data?.data.totalPages || 1;
             const startIndex = Math.floor((currentPage - 1) / 5) * 5 + 1;
             const endIndex = startIndex + 4 > totalPages ? totalPages :startIndex + 4;
 
@@ -38,36 +54,61 @@ function AdminMenuPage(props) {
             }
             setPageNumbers(newPageNumbers);
         }
-    }, [searchMenuList.data]);
+    }, [countMenuListByCategory.data]);
 
+        // const handlePageNumbersOnClick = (pageNumber) => {
+    //     searchParams.set("page", pageNumber);
+    //     setSearchParams(searchParams);
+    // }
+
+    //카테고리 바꾸면 다시 로딩
+    // useEffect(() => {
+    //     searchMenuList.refetch();
+    // }, [searchParams]);
+
+    
+
+
+
+    //카테고리, 페이지 변동시 재로딩
     useEffect(() => {
-        searchMenuList.refetch();
     }, [searchParams]);
 
-    const handlePageNumbersOnClick = (pageNumber) => {
-        searchParams.set("page", pageNumber);
+    const handleSelectCategoryOnChange = (option) => {
+        searchParams.set("category", option.target.value);
         setSearchParams(searchParams);
     }
 
-    const handleSelectOnChage = (option) => {
-        searchParams.set("category", option.value);
+    const handlePageNumbersOnClick = (option) => {
+        searchParams.set("page", option.target.value);
         setSearchParams(searchParams);
     }
 
 
+
+    //console.log(searchMenuList);
+    //목록 불러오기
     const renderMenuList = () => {
-        // 카테고리가 'all'인 경우, 모든 메뉴 출력
-        if (category === 'all') {
-            return searchMenuList?.data?.data.items.map((menu) => (
-                <li key={menu.menu_id}>
-                    {menu.menu_name} - {menu.menu_price} - {menu.menu_state}
+        //카테고리가 해당하는 메뉴 불러오기.
+        if (category !== "전체") {
+            return searchMenuList?.data
+            .filter((menu) => menu.menuCategory === category) 
+            .map((menu) => (
+                <li key={menu.menuId}>
+                    <div>{menu.menuId}</div>
+                    <div>{menu.menuName}</div>
+                    <div>{menu.menuPrice[0].menuPrice}</div>
+                    <div>{menu.isExposure}</div>
                 </li>
             ));
         }
-
-        return searchMenuList?.data?.data.items.map((menu) => (
-            <li key={menu.menu_id}>
-                {menu.menu_name} - {menu.menu_price} - {menu.menu_state}
+        // 카테고리가 '전체'인 경우, 모든 메뉴 출력
+        return searchMenuList?.data.map((menu) => (
+            <li key={menu.menuId}>
+                <div>{menu.menuId}</div>
+                <div>{menu.menuName}</div>
+                <div>{menu.menuPrice[0].menuPrice}</div>
+                <div>{menu.isExposure}</div>
             </li>
         ));
     };
@@ -92,8 +133,7 @@ function AdminMenuPage(props) {
                             })
                         }}
                         value={category}
-                        onChange={handleSelectOnChage}
-                        displayEmpty
+                        onChange={handleSelectCategoryOnChange}
                         fullWidth
                     >
                         {selectCategories.map((categoryOption) => (
@@ -106,8 +146,14 @@ function AdminMenuPage(props) {
             </div>
 
             <div>
-                <h3>{category !== 'all' ? `${category} 리스트` : "전체 리스트"}</h3>
-                <ul>
+                <h3>{category !== '전체' ? `${category} 리스트` : "전체 리스트"}</h3>
+                <ul css={s.menuListContainer}>
+                    <li>
+                        <div>NO.</div>
+                        <div>Name</div>
+                        <div>Price</div>
+                        <div>On/Off</div>
+                    </li>
                     { renderMenuList() }
                 </ul>
             </div>
@@ -134,57 +180,6 @@ function AdminMenuPage(props) {
 export default AdminMenuPage;
 
 
-    // 임시 데이터, 카테고리별 리스트 예시
-    // const categoryLists = {
-    //     burger: [
-    //         { name: "불고기 버거", price: "5000원" },
-    //         { name: "치즈버거", price: "5500원" },
-    //         { name: "햄버거", price: "4500원" },
-    //         { name: "더블 불고기 버거", price: "6500원" },
-    //         { name: "베이컨 버거", price: "6000원" },
-    //         { name: "새우 버거", price: "5800원" },
-    //         { name: "치킨 버거", price: "5200원" },
-    //         { name: "스파이시 버거", price: "5900원" },
-    //         { name: "머쉬룸 버거", price: "6500원" },
-    //         { name: "콰트로 치즈버거", price: "7000원" },
-    //     ],
-    //     side: [
-    //         { name: "감자튀김", price: "2000원" },
-    //         { name: "어니언 링", price: "2500원" },
-    //         { name: "너겟", price: "2500원" },
-    //         { name: "모짜렐라 스틱", price: "3000원" },
-    //         { name: "치킨너겟", price: "3500원" },
-    //         { name: "콜리플라워 튀김", price: "2800원" },
-    //         { name: "매운 감자튀김", price: "2300원" },
-    //         { name: "핫윙", price: "4000원" },
-    //         { name: "튀긴 양파", price: "2200원" },
-    //         { name: "고구마튀김", price: "2700원" },
-    //     ],
-    //     drink: [
-    //         { name: "콜라", price: "1500원" },
-    //         { name: "사이다", price: "1500원" },
-    //         { name: "환타", price: "1500원" },
-    //         { name: "레몬에이드", price: "2500원" },
-    //         { name: "홍차", price: "2000원" },
-    //         { name: "아이스티", price: "2200원" },
-    //         { name: "자몽 에이드", price: "2700원" },
-    //         { name: "딸기 우유", price: "2200원" },
-    //         { name: "우유", price: "1500원" },
-    //         { name: "탄산수", price: "1800원" },
-    //     ],
-    //     coffee: [
-    //         { name: "아메리카노", price: "3000원" },
-    //         { name: "라떼", price: "3500원" },
-    //         { name: "카푸치노", price: "3700원" },
-    //         { name: "카페모카", price: "4000원" },
-    //         { name: "아이스 아메리카노", price: "3200원" },
-    //         { name: "바닐라 라떼", price: "3800원" },
-    //         { name: "카라멜 마키아토", price: "4000원" },
-    //         { name: "헤이즐넛 라떼", price: "3800원" },
-    //         { name: "더블 샷 아메리카노", price: "3500원" },
-    //         { name: "아이ced 카푸치노", price: "3900원" },
-    //     ],
-    // };
 
     //한 페이지당 담길 리스트
     // const renderMenuList = () => {

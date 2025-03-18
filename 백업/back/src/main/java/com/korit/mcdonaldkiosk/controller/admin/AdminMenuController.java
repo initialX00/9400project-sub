@@ -1,6 +1,8 @@
 package com.korit.mcdonaldkiosk.controller.admin;
 
 
+import com.korit.mcdonaldkiosk.dto.request.ReqMenuListDto;
+import com.korit.mcdonaldkiosk.dto.response.RespMenuListDto;
 import com.korit.mcdonaldkiosk.entity.Menu;
 import com.korit.mcdonaldkiosk.service.admin.AdminMenuService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,24 +23,45 @@ public class AdminMenuController {
 
     // 카테고리 목록을 조회하는 API
     @GetMapping("/categories")
-    public ResponseEntity<List<Menu>> getCategories() {
-        // 모든 카테고리 정보를 반환
+    public ResponseEntity<List<String>> getCategories() {
         return ResponseEntity.ok().body(adminMenuService.getAllCategories());
     }
 
     // 모든 메뉴 리스트를 조회하는 API
-    @GetMapping("/menu/all")
-    public ResponseEntity<List<Menu>> getCategoryInfo() {
-        // 카테고리 이름을 받아서 해당 카테고리의 정보를 반환
+    @GetMapping("/menus")
+    public ResponseEntity<List<Menu>> getAllMenuList() {
         return ResponseEntity.ok().body(adminMenuService.getAllAdminMenuList());
     }
 
+    // 페이지 갯수 API
+    @GetMapping("/list")
+    public ResponseEntity<?> searchBoardList(@ModelAttribute ReqMenuListDto dto) {
+        //메뉴 갯수
+        int totalMenuListCount = adminMenuService.getMenuListCountByCategory(dto.getCategory());
+        //페이지 수 계산
+        int totalPages = totalMenuListCount * dto.getLimitCount() == 0
+                ? totalMenuListCount / dto.getLimitCount()
+                : totalMenuListCount / dto.getLimitCount() + 1;
 
-    // 특정 카테고리의 리스트를 조회하는 API
-    @GetMapping("/menu/{categoryName}")
-    public ResponseEntity<List<Menu>> getCategoryInfo(@PathVariable String categoryName) {
-        // 카테고리 이름을 받아서 해당 카테고리의 정보를 반환
-        return ResponseEntity.ok().body(adminMenuService.getAdminMenuListByCategory(categoryName));
+        //빌더로 객체를 생성하여 응답 담기
+        RespMenuListDto respMenuListDto =
+                RespMenuListDto.builder()
+                        .page(dto.getPage())
+                        .limitCount(dto.getLimitCount())
+                        .totalPages(totalPages)
+                        .totalElements(totalMenuListCount)
+                        .isFirstPage(dto.getPage() == 1)
+                        .isLastPage(dto.getPage() == totalPages)
+                        .nextPage(dto.getPage() != totalPages ? dto.getPage() + 1 :0)
+                        //.menuList(adminMenuService.getAdminMenuListByCategory(dto.getCategory())) //검색 조건에 맞는 게시글 목록을 가져오기
+                        .build();
+
+        return ResponseEntity.ok().body(respMenuListDto);
     }
+
+
+
+
+
 
 }

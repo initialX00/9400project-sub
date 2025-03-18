@@ -11,19 +11,21 @@
         <result property="menuSequence" column="menu_sequence" />
         <result property="singleImg" column="single_img" />
         <result property="setImg" column="set_img" />
+        <result property="isExposure" column="is_exposure" />
 
-        <association property="menuPrice" resultMap="menuPriceResultMap"/>
+        <collection property="menuPrice" resultMap="menuPriceResultMap"/>
     </resultMap>
 
     <resultMap id="menuPriceResultMap" type="com.korit.mcdonaldkiosk.entity.MenuPrice">
         <id property="menuPriceId" column="menu_price_id" />
         <result property="menuId" column="mt_menu_id" />
+        <result property="size" column="size" />
         <result property="menuPrice" column="menu_price" />
-        <result property="menuSetPrice" column="menu_set_price" />
-        <result property="menuSetLunchPrice" column="menu_set_lunch_price" />
-        <result property="menuLargePrice" column="menu_large_price" />
+        <result property="discountPrice" column="discount_price" />
     </resultMap>
 
+
+    <!--카테고리만 불러오기-->
     <select id="selectAllCategories" resultMap="menuResultMap">
         SELECT
             menu_category
@@ -33,28 +35,30 @@
             menu_category
     </select>
 
+    <!--모든 메뉴 불러오기-->
     <select id="selectAllAdminMenus" resultMap="menuResultMap">
         SELECT
             mt.menu_id,
             mt.menu_name,
             mt.menu_category,
-            mpt.menu_price
+            mpt.menu_price,
+            mt.is_exposure
         FROM
             menu_tb mt
             LEFT OUTER JOIN menu_price_tb mpt ON mt.menu_id = mpt.menu_id
     </select>
 
-    <select id="selectAdminMenusByCategory" resultMap="menuResultMap">
-        SELECT
-            mt.menu_id,
-            mt.menu_name,
-            mt.menu_category,
-            mpt.menu_price
-        FROM
-            menu_tb mt
-            LEFT OUTER JOIN menu_price_tb mpt ON mt.menu_id = mpt.menu_id
-        where
-            mt.menu_category = #{menuCategory}
+    <!--리스트 갯수 불러오기-->
+    <select id="selectMenuCountAllByCategory" resultType="java.lang.Integer">
+        select
+            count(*)
+        from
+            menu_tb
+        <where>
+            <if test="searchCategory != null and searchCategory != '' and searchCategory != '전체'">
+                title like concat(#{searchCategory})
+            </if>
+        </where>
     </select>
 
 

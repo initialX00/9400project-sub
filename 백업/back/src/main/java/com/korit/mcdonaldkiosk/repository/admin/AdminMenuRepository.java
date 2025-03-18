@@ -23,8 +23,10 @@ public class AdminMenuRepository {
         return adminMenuMapper.selectAllAdminMenus();
     }
 
-    // 카테고리에 해당하는 리스트를 반환
-    public List<Menu> findAdminMenusByCategory(String category) {
-        return adminMenuMapper.selectAdminMenusByCategory(category);
+    // 해당 카테고리의 메뉴 갯수를 반환
+    public int findMenuCountAllBySearchCategory(String searchCategory) {
+        return adminMenuMapper.selectMenuCountAllByCategory(searchCategory);
     }
+
+
 }

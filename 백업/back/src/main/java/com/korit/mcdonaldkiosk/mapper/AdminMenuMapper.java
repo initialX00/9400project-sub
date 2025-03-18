@@ -2,6 +2,7 @@ package com.korit.mcdonaldkiosk.mapper;
 
 import com.korit.mcdonaldkiosk.entity.Menu;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
@@ -11,5 +12,5 @@ public interface AdminMenuMapper {
 
     List<Menu> selectAllAdminMenus();
 
-    List<Menu> selectAdminMenusByCategory(String category);
+    int selectMenuCountAllByCategory(@Param("searchCategory") String searchCategory);
 }

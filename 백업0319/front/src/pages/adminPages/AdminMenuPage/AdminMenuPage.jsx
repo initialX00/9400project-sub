@@ -175,19 +175,21 @@ function AdminMenuPage(props) {
             </div>
 
             <div css={s.footer}>
-                <button disabled={page === 1} onClick={() => handlePageNumbersOnClick(page - 1)}>
-                    <GoChevronLeft/>
-                </button>
-                {
-                    pageNumbers.map(number => //css={s.pageNum(page === number)}
-                        <button key={number} onClick={() => handlePageNumbersOnClick(number)}>
-                            <span>{number}</span>
-                        </button>
-                    )
-                }
-                <button disabled={page === totalPages} onClick={() => handlePageNumbersOnClick(page + 1)}>
-                    <GoChevronRight />
-                </button>
+                <div css={s.pageNumbers}>
+                    <button disabled={page === 1} onClick={() => handlePageNumbersOnClick(page - 1)}>
+                        <GoChevronLeft/>
+                    </button>
+                    {
+                        pageNumbers.map(number => //css={s.pageNum(page === number)}
+                            <button key={number} onClick={() => handlePageNumbersOnClick(number)}>
+                                <span>{number}</span>
+                            </button>
+                        )
+                    }
+                    <button disabled={page === totalPages} onClick={() => handlePageNumbersOnClick(page + 1)}>
+                        <GoChevronRight />
+                    </button>
+                </div>
             </div>
         </div>
     );

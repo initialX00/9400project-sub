@@ -3,29 +3,10 @@
 http://localhost:8080/swagger-ui/index.html#/
 
 
-
-상태 구현하기.
-
-페이지 swagger 입력까지함. 프론트에 구현하기. (값적으면됨)
-
-
-
-
-
-
-
-
-
-
-
-
-
-회원가입 - 로그인 - jwt토큰 생성 및 응답 - 로컬스토리지에 저장 - 인증이 필요한 곳에 사용
-
-csrf사이트호출 미사용, 별도창로그인 미사용, form 미사용, 세션 미사용, cors 사용, 필터 사용, 예외 핸들러 사용, 요청url 권한 세팅
-
-prisiper - atherities에 각종 권한 정보가 저장
-
+api 서버와 클라이언트 간 서비스 상호작용
+query 데이터 조회 (읽기 전용)
+mutaion 데이터 변경 요청(추가,수정,삭제)
+hook 함수형 컴포넌트(api등)의 호출 결과를 상태로 관리.
 
 
 
@@ -49,4 +30,170 @@ prisiper - atherities에 각종 권한 정보가 저장
 
 
 
+#########토클##################
+const ToggleButton = () => {
+  // 상태 초기값을 'off'로 설정
+  const [isOn, setIsOn] = useState(false);
 
+  // 버튼 클릭 시 상태를 토글하는 함수
+  const handleClick = () => {
+    setIsOn(prevState => !prevState); // 'on'과 'off'를 토글
+  };
+
+  return (
+    <button
+      className={`toggle-button ${isOn ? 'on' : 'off'}`}  // 상태에 따라 클래스 변경
+      onClick={handleClick}
+    >
+      {isOn ? "ON" : "OFF"} {/* 상태에 따라 버튼 텍스트 변경 */}
+    </button>
+  );
+};
+
+/* 공통 스타일 */
+.toggle-button {
+  padding: 10px 20px;
+  font-size: 16px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s, color 0.3s;
+}
+
+/* ON 상태일 때 스타일 */
+.toggle-button.on {
+  background-color: green;
+  color: white;
+}
+
+/* OFF 상태일 때 스타일 */
+.toggle-button.off {
+  background-color: gray;
+  color: white;
+}
+
+
+
+########체크박스###############
+import React, { useState } from 'react';
+import './StyledCheckbox.css';  // 스타일을 위한 CSS 파일을 따로 분리
+
+function StyledCheckbox() {
+  // 1. useState로 체크박스 상태를 관리합니다.
+  // 체크박스가 체크되면 true, 체크되지 않으면 false
+  const [isChecked, setIsChecked] = useState(false);
+
+  // 2. 체크박스를 클릭할 때 상태를 반전시키는 함수
+  const handleChange = () => {
+    setIsChecked(!isChecked);
+  };
+
+  return (
+    <div className="checkbox-container">
+      <label className="custom-checkbox">
+        {/* 기본 체크박스 스타일을 없애고, 커스텀 디자인을 적용 */}
+        <input 
+          type="checkbox" 
+          checked={isChecked} 
+          onChange={handleChange}
+        />
+        <span className="checkmark"></span> {/* 커스터마이징된 체크박스 모양 */}
+        {isChecked ? '체크됨' : '체크 안 됨'}
+      </label>
+    </div>
+  );
+}
+
+export default StyledCheckbox;
+
+
+
+.checkbox-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 20px;
+}
+
+.custom-checkbox {
+  position: relative;
+  display: inline-block;
+  cursor: pointer;
+  font-size: 18px;
+  padding-left: 35px; /* 체크박스를 왼쪽으로 밀어서 텍스트랑 간격을 띄움 */
+}
+
+.custom-checkbox input {
+  /* 기본 체크박스 스타일을 제거 */
+  appearance: none;
+  -webkit-appearance: none; /* Safari에서 기본 스타일을 제거 */
+  -moz-appearance: none; /* Firefox에서 기본 스타일을 제거 */
+  position: absolute;
+  opacity: 0; /* 체크박스를 화면에서 숨김 */
+}
+
+.custom-checkbox .checkmark {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 20px;
+  width: 20px;
+  background-color: #ddd; /* 기본 체크박스 색상 */
+  border-radius: 4px; /* 둥근 모서리 */
+  transition: background-color 0.3s, border-color 0.3s; /* 배경색 전환 효과 */
+}
+
+.custom-checkbox input:checked + .checkmark {
+  background-color: #4CAF50; /* 체크되었을 때의 배경색 */
+  border-color: #4CAF50; /* 체크되었을 때의 테두리 색상 */
+}
+
+.custom-checkbox input:checked + .checkmark:after {
+  content: ''; 
+  position: absolute;
+  left: 6px;
+  top: 3px;
+  width: 7px;
+  height: 12px;
+  border: solid white;
+  border-width: 0 3px 3px 0;
+  transform: rotate(45deg);
+}
+
+.custom-checkbox:hover .checkmark {
+  background-color: #ccc; /* 마우스를 올렸을 때 색상 변화 */
+}
+
+.custom-checkbox input:focus + .checkmark {
+  outline: 2px solid #ff6347; /* 체크박스를 클릭했을 때 테두리 색상 */
+}
+
+
+
+
+
+
+
+
+
+json 형태로 입력이 들어오고 있어. 어떻게 수정해야될까?
+
+@Data
+public class ReqExposureDto {
+    private int menuId;
+    private int isExposure;
+}
+
+@RestController
+@RequestMapping("/api/admin")
+public class AdminMenuController {
+    @PutMapping("/isExposure")
+    public ResponseEntity<?> changeExposure(
+            @RequestBody ReqExposureDto request
+    ) {
+        //받은값 int로 변환
+        int menuId = request.getMenuId();
+        int isExposure = request.getIsExposure();
+        adminMenuService.changeIsExposure(menuId, isExposure);
+        return ResponseEntity.ok().build();
+    }

@@ -95,4 +95,6 @@ username, password 바꾸기
 
 
 ㅇ디비
+database-1.c36cc2w8my7l.ap-northeast-2.rds.amazonaws.com
+admin
 !1Aㅐㄱ도날드

@@ -24,6 +24,14 @@ git checkout (브랜치 명)
 
 
 
+받을때
+git fetch origin 브랜치명
+git pull origin 브랜치명
+
+올릴때
+git fetch origin
+git checkout (브랜치 명)
+git add .
 
 
 
